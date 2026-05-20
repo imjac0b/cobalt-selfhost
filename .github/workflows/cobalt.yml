@@ -30,17 +30,10 @@ jobs:
         with:
           repository: imputnet/cobalt
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 'latest'
-          cache: 'pnpm'
-
+      - uses: oven-sh/setup-bun@v2
+      
       - name: Install Root Dependencies
-        run: pnpm install --ignore-scripts
+        run: bun install --ignore-scripts
 
       - name: Patch Configuration Files
         working-directory: ./web
@@ -50,13 +43,20 @@ jobs:
           sed -i 's|"font-src": \["self"\]|"font-src": ["self", "https://cdn.jsdelivr.net"]|g' svelte.config.js
           sed -i 's|"style-src": \["self", "unsafe-inline"\]|"style-src": ["self", "unsafe-inline", "https://cdn.jsdelivr.net"]|g' svelte.config.js
 
+          sed -i 's|</head>|<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/imjac0b/apple-fonts@latest/SF-Pro/Display/SF-Pro-Display-latin.min.css">\n</head>|g' src/app.html
+
+          sed -i '/@fontsource\/ibm-plex-mono/d' src/routes/+layout.svelte
+
+          sed -i 's|IBM Plex Mono|SF-Pro|g' src/app.css
+          sed -i 's|IBM Plex Mono|SF-Pro|g' src/routes/+layout.svelte
+
       - name: Install Web Dependencies & Build
         working-directory: ./web
         env:
           WEB_DEFAULT_API: "https://cobalt-api.jacob.com.hk"
         run: |
-          pnpm install
-          pnpm run build
+          bun install
+          bun run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
