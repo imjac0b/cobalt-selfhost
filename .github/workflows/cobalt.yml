@@ -45,6 +45,8 @@ jobs:
 
       - name: Install Web Dependencies & Build
         working-directory: ./web
+        env:
+          WEB_DEFAULT_API: "https://cobalt-api.jacob.com.hk"
         run: |
           bun install
           bun run build
